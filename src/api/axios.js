@@ -49,7 +49,7 @@ api.interceptors.response.use(
 
     try {
       const refreshToken = localStorage.getItem('refresh_token')
-      const { data } = await axios.post(`${BASE_URL}/auth/refresh`, {
+      const { data } = await axios.post(`${BASE_URL}/web/auth/refresh`, {
         refresh_token: refreshToken
       }, {
         headers: { 'X-Client-Type': 'web', 'Content-Type': 'application/json' }

@@ -33,7 +33,7 @@ export function TeamMembersPage() {
   const columnHelper = createColumnHelper()
   const columns = useMemo(
     () => [
-      columnHelper.accessor('name', {
+      columnHelper.accessor('username', {
         header: ({ column }) => (
           <button
             type="button"
@@ -47,9 +47,9 @@ export function TeamMembersPage() {
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium shrink-0">
-              {row.original.name?.charAt(0)?.toUpperCase() ?? '?'}
+              {row.original.username?.charAt(0)?.toUpperCase() ?? '?'}
             </div>
-            <span className="font-medium text-white">{row.original.name}</span>
+            <span className="font-medium text-white">{row.original.username}</span>
           </div>
         )
       }),
@@ -208,9 +208,9 @@ export function TeamMembersPage() {
                         <td
                           key={cell.id}
                           className={`
-                            px-4 py-3 text-sm
+                            px-4 py-3 text-white text-sm
                             ${cell.column.columnDef.meta?.hideOnMobile === true ? 'hidden md:table-cell' : ''}
-                            ${cell.column.columnDef.meta?.hideOnLg === true ? 'hidden lg:table-cell' : ''}
+                            ${cell.column.columnDef.meta?.hideOnLg === true ? 'hidden lg:table-cell ' : ''}
                           `}
                         >
                           {flexRender(

@@ -31,9 +31,12 @@ export function CreateUserPage() {
         return
       }
       try {
+        console.log('CreateUserPage: Loading team members...')
         const res = await getTeamMembers()
+        console.log('CreateUserPage: Team members response:', res.data)
         setMembers(res.data)
       } catch (e) {
+        console.error('CreateUserPage: Failed to load managers:', e)
         setError(e.response?.data?.message || 'Failed to load managers')
       } finally {
         setMembersLoading(false)
@@ -45,6 +48,9 @@ export function CreateUserPage() {
   const managerOptions = members.filter(
     (m) => m.roles?.includes('manager') || m.roles?.includes('admin')
   )
+  
+  console.log('CreateUserPage: All members:', members)
+  console.log('CreateUserPage: Manager options:', managerOptions)
   const visibleRoleOptions = isAdmin
     ? ROLE_OPTIONS
     : ROLE_OPTIONS.filter((r) => r.value !== 'admin')

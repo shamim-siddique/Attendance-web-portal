@@ -44,9 +44,9 @@ const statusLabel = {
 }
 
 export function LeaveRequestsPage() {
-  const [startDate, setStartDate] = useState(getFirstDayOfMonth())
-  const [endDate, setEndDate] = useState(getToday())
-  const [statusFilter, setStatusFilter] = useState('pending')
+  const [startDate, setStartDate] = useState('2026-01-01')  // Start of year
+  const [endDate, setEndDate] = useState('2026-12-31')      // End of year
+  const [statusFilter, setStatusFilter] = useState('all')  // All statuses
   const { data: leaves, loading, refetch } = useLeaveRequests(
     startDate,
     endDate,
@@ -82,7 +82,7 @@ export function LeaveRequestsPage() {
   const columnHelper = createColumnHelper()
   const columns = useMemo(
     () => [
-      columnHelper.accessor('name', {
+      columnHelper.accessor('username', {
         header: ({ column }) => (
           <button
             type="button"
@@ -96,15 +96,15 @@ export function LeaveRequestsPage() {
           <div>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium shrink-0">
-                {row.original.name?.charAt(0)?.toUpperCase() ?? '?'}
+                {row.original.username?.charAt(0)?.toUpperCase() ?? '?'}
               </div>
-              <span className="font-medium text-white">{row.original.name}</span>
+              <span className="font-medium text-white">{row.original.username}</span>
             </div>
             <p className="text-slate-400 text-xs mt-0.5">{row.original.email}</p>
           </div>
         )
       }),
-      columnHelper.accessor('date', {
+      columnHelper.accessor('leave_date', {
         header: ({ column }) => (
           <button
             type="button"
@@ -286,11 +286,10 @@ export function LeaveRequestsPage() {
 
       {toast && (
         <div
-          className={`rounded-xl px-4 py-3 ${
-            toast.type === 'success'
+          className={`rounded-xl px-4 py-3 ${toast.type === 'success'
               ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
               : 'bg-rose-500/10 border border-rose-500/20 text-rose-400'
-          }`}
+            }`}
         >
           {toast.message}
         </div>
@@ -362,15 +361,13 @@ export function LeaveRequestsPage() {
                       {headerGroup.headers.map((header) => (
                         <th
                           key={header.id}
-                          className={`text-left text-xs font-semibold uppercase tracking-wider text-slate-500 px-4 py-3 ${
-                            header.column.columnDef.meta?.hideOnMobile
+                          className={`text-left text-xs font-semibold uppercase tracking-wider text-slate-500 px-4 py-3 ${header.column.columnDef.meta?.hideOnMobile
                               ? 'hidden md:table-cell'
                               : ''
-                          } ${
-                            header.column.columnDef.meta?.hideOnLg
+                            } ${header.column.columnDef.meta?.hideOnLg
                               ? 'hidden lg:table-cell'
                               : ''
-                          }`}
+                            }`}
                         >
                           {flexRender(
                             header.column.columnDef.header,
@@ -390,15 +387,13 @@ export function LeaveRequestsPage() {
                       {row.getVisibleCells().map((cell) => (
                         <td
                           key={cell.id}
-                          className={`px-4 py-3 text-sm ${
-                            cell.column.columnDef.meta?.hideOnMobile
+                          className={`px-4 py-3 text-sm ${cell.column.columnDef.meta?.hideOnMobile
                               ? 'hidden md:table-cell'
                               : ''
-                          } ${
-                            cell.column.columnDef.meta?.hideOnLg
+                            } ${cell.column.columnDef.meta?.hideOnLg
                               ? 'hidden lg:table-cell'
                               : ''
-                          }`}
+                            }`}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
@@ -447,7 +442,7 @@ export function LeaveRequestsPage() {
         title="Reject Leave Request"
         subtitle={
           rejectTarget
-            ? `${rejectTarget.name} · ${formatDate(rejectTarget.date)}`
+            ? `${rejectTarget.username} · ${formatDate(rejectTarget.leave_date)}`
             : ''
         }
         footer={
@@ -478,12 +473,12 @@ export function LeaveRequestsPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl">
               <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-medium">
-                {rejectTarget.name?.charAt(0)?.toUpperCase() ?? '?'}
+                {rejectTarget.username?.charAt(0)?.toUpperCase() ?? '?'}
               </div>
               <div>
-                <p className="font-medium text-white">{rejectTarget.name}</p>
+                <p className="font-medium text-white">{rejectTarget.username}</p>
                 <p className="text-slate-400 text-sm">
-                  {formatDate(rejectTarget.date)}
+                  {formatDate(rejectTarget.leave_date)}
                   {rejectTarget.reason ? ` · ${rejectTarget.reason}` : ''}
                 </p>
               </div>

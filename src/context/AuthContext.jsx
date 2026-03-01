@@ -20,12 +20,29 @@ export function AuthProvider({ children }) {
     setRoles(decoded.roles || [])
   }
 
-  const logout = () => {
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
-    setUser(null)
-    setRoles([])
-    window.location.href = '/login'
+  const logout = async () => {
+    try {
+      const refresh_token = localStorage.getItem('refresh_token')
+      const access_token = localStorage.getItem('access_token')
+      if (refresh_token) {
+        // Attempt backend logout (if exists) to revoke refresh token
+        await fetch(import.meta.env.VITE_API_BASE_URL + '/web/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Client-Type': 'web',
+            'Authorization': 'Bearer ' + access_token
+          },
+          body: JSON.stringify({ refresh_token })
+        }).catch(() => { })
+      }
+    } finally {
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      setUser(null)
+      setRoles([])
+      window.location.href = '/login'
+    }
   }
 
   useEffect(() => {

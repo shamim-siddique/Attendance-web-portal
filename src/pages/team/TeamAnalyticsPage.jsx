@@ -33,7 +33,7 @@ export function TeamAnalyticsPage() {
   const [startDate, setStartDate] = useState(getFirstDayOfMonth())
   const [endDate, setEndDate] = useState(getToday())
   const { data, loading, refetch } = useTeamAnalytics(startDate, endDate)
-  const members = data.members || []
+  const members = data.team_members || []
   const aggregate = data.aggregate || {}
 
   const SortIcon = ({ column }) => {
@@ -233,8 +233,8 @@ export function TeamAnalyticsPage() {
         <StatCard
           label="Avg Attendance Rate"
           value={
-            aggregate.avg_attendance_percentage != null
-              ? `${Number(aggregate.avg_attendance_percentage).toFixed(1)}%`
+            aggregate.average_attendance_percentage != null
+              ? `${Number(aggregate.average_attendance_percentage).toFixed(1)}%`
               : '—'
           }
           icon={TrendingUp}
@@ -243,21 +243,21 @@ export function TeamAnalyticsPage() {
         />
         <StatCard
           label="Total Present"
-          value={aggregate.total_present ?? '—'}
+          value={aggregate.present_days ?? '—'}
           icon={CheckCircle2}
           iconBg="emerald"
           loading={loading}
         />
         <StatCard
           label="Total Half Days"
-          value={aggregate.total_half ?? '—'}
+          value={aggregate.half_days ?? '—'}
           icon={Clock}
           iconBg="amber"
           loading={loading}
         />
         <StatCard
           label="Total Absent"
-          value={aggregate.total_absent ?? '—'}
+          value={aggregate.absent_days ?? '—'}
           icon={XCircle}
           iconBg="rose"
           loading={loading}
@@ -291,11 +291,10 @@ export function TeamAnalyticsPage() {
                       {headerGroup.headers.map((header) => (
                         <th
                           key={header.id}
-                          className={`text-left text-xs font-semibold uppercase tracking-wider text-slate-500 px-4 py-3 ${
-                            header.column.columnDef.meta?.hideOnMobile
+                          className={`text-left text-xs font-semibold uppercase tracking-wider text-slate-500 px-4 py-3 ${header.column.columnDef.meta?.hideOnMobile
                               ? 'hidden md:table-cell'
                               : ''
-                          }`}
+                            }`}
                         >
                           {flexRender(
                             header.column.columnDef.header,
@@ -315,11 +314,10 @@ export function TeamAnalyticsPage() {
                       {row.getVisibleCells().map((cell) => (
                         <td
                           key={cell.id}
-                          className={`px-4 py-3 text-sm ${
-                            cell.column.columnDef.meta?.hideOnMobile
+                          className={`px-4 py-3 text-sm ${cell.column.columnDef.meta?.hideOnMobile
                               ? 'hidden md:table-cell'
                               : ''
-                          }`}
+                            }`}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,

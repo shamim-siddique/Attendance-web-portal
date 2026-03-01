@@ -10,7 +10,8 @@ import {
   ClipboardList,
   UserPlus,
   MapPin,
-  LogOut
+  LogOut,
+  Smartphone
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { Badge } from '../ui/Badge'
@@ -22,6 +23,7 @@ const navItems = [
   { to: '/team/attendance', icon: CalendarCheck, label: 'Attendance' },
   { to: '/team/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/team/leaves', icon: ClipboardList, label: 'Leave Requests' },
+  { to: '/team/device-change-requests', icon: Smartphone, label: 'Device Requests' },
   { to: '/users/create', icon: UserPlus, label: 'Create User' },
   { to: '/users/locations', icon: MapPin, label: 'Locations' }
 ]

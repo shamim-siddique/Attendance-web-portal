@@ -10,9 +10,12 @@ export function useTeamAttendance(startDate, endDate) {
     setLoading(true)
     setError(null)
     try {
+      console.log('Fetching attendance for:', startDate, 'to', endDate)
       const res = await getTeamAttendance(startDate, endDate)
+      console.log('Attendance response:', res.data)
       setData(res.data)
     } catch (e) {
+      console.error('Attendance fetch error:', e)
       setError(e.response?.data?.message || 'Failed to load attendance')
     } finally {
       setLoading(false)

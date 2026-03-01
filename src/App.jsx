@@ -8,7 +8,9 @@ import { UserLocationsPage } from './pages/users/UserLocationsPage'
 import { TeamMembersPage } from './pages/team/TeamMembersPage'
 import { TeamAttendancePage } from './pages/team/TeamAttendancePage'
 import { TeamAnalyticsPage } from './pages/team/TeamAnalyticsPage'
+import { TeamMapPage } from './pages/team/TeamMapPage'
 import { LeaveRequestsPage } from './pages/leaves/LeaveRequestsPage'
+import { DeviceChangeRequests } from './pages/shared/DeviceChangeRequests'
 
 export default function App() {
   return (
@@ -24,7 +26,9 @@ export default function App() {
           <Route path="/team/members" element={<TeamMembersPage />} />
           <Route path="/team/attendance" element={<TeamAttendancePage />} />
           <Route path="/team/analytics" element={<TeamAnalyticsPage />} />
+          <Route path="/team/map" element={<TeamMapPage />} />
           <Route path="/team/leaves" element={<LeaveRequestsPage />} />
+          <Route path="/team/device-change-requests" element={<DeviceChangeRequests />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

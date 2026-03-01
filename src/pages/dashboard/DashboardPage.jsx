@@ -24,10 +24,11 @@ export function DashboardPage() {
   const { user, isAdmin } = useAuth()
   const navigate = useNavigate()
   const today = getToday()
-  const firstDayOfMonth = getFirstDayOfMonth()
+  const firstDayOfMonth = '2026-01-01'  // Start of year for testing
+  const endDate = '2026-12-31'        // End of year for testing
 
   const [members, setMembers] = useState([])
-  const [analytics, setAnalytics] = useState({ members: [], aggregate: {} })
+  const [analytics, setAnalytics] = useState({ team_members: [], aggregate: {} })
   const [pendingLeaves, setPendingLeaves] = useState([])
   const [loading, setLoading] = useState(true)
   const [approvingId, setApprovingId] = useState(null)
@@ -35,7 +36,7 @@ export function DashboardPage() {
   const [rejectReason, setRejectReason] = useState('')
   const [toast, setToast] = useState(null)
 
-  const firstName = user?.name?.split(' ')[0] || 'there'
+  const firstName = user?.username?.split(' ')[0] || 'there'
   const hour = new Date().getHours()
   const greeting =
     hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : 'Evening'
@@ -51,22 +52,29 @@ export function DashboardPage() {
     const load = async () => {
       setLoading(true)
       try {
+        console.log('Loading dashboard data...')
         const [membersRes, analyticsRes, leavesRes] = await Promise.all([
           getTeamMembers(),
-          getTeamAnalytics(firstDayOfMonth, today),
-          getTeamLeaves(firstDayOfMonth, today, 'pending')
+          getTeamAnalytics(firstDayOfMonth, endDate),
+          getTeamLeaves(firstDayOfMonth, endDate, 'pending')
         ])
+        console.log('Dashboard responses:', { 
+          members: membersRes.data, 
+          analytics: analyticsRes.data, 
+          leaves: leavesRes.data 
+        })
         setMembers(membersRes.data)
         setAnalytics(analyticsRes.data)
         setPendingLeaves(leavesRes.data)
       } catch (e) {
+        console.error('Dashboard load error:', e)
         setToast({ type: 'error', message: e.response?.data?.message || 'Failed to load dashboard' })
       } finally {
         setLoading(false)
       }
     }
     load()
-  }, [firstDayOfMonth, today])
+  }, [firstDayOfMonth, endDate])
 
   const handleApprove = async (leaveId) => {
     setApprovingId(leaveId)
@@ -106,11 +114,10 @@ export function DashboardPage() {
     <div className="space-y-8">
       {toast && (
         <div
-          className={`rounded-xl px-4 py-3 ${
-            toast.type === 'success'
+          className={`rounded-xl px-4 py-3 ${toast.type === 'success'
               ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
               : 'bg-rose-500/10 border border-rose-500/20 text-rose-400'
-          }`}
+            }`}
         >
           {toast.message}
         </div>
@@ -139,8 +146,8 @@ export function DashboardPage() {
           value={
             loading
               ? '—'
-              : agg.avg_attendance_percentage != null
-                ? `${Number(agg.avg_attendance_percentage).toFixed(1)}%`
+              : agg.average_attendance_percentage != null
+                ? `${Number(agg.average_attendance_percentage).toFixed(1)}%`
                 : '—'
           }
           sub="This month"
@@ -150,7 +157,7 @@ export function DashboardPage() {
         />
         <StatCard
           label="Present Days"
-          value={loading ? '—' : (agg.total_present ?? '—')}
+          value={loading ? '—' : (agg.present_days ?? '—')}
           sub="Across team, this month"
           icon={CheckCircle2}
           iconBg="blue"
@@ -158,7 +165,7 @@ export function DashboardPage() {
         />
         <StatCard
           label="Absent Days"
-          value={loading ? '—' : (agg.total_absent ?? '—')}
+          value={loading ? '—' : (agg.absent_days ?? '—')}
           sub="Across team, this month"
           icon={XCircle}
           iconBg="rose"
@@ -201,12 +208,12 @@ export function DashboardPage() {
                   className="flex flex-wrap items-center gap-3 px-4 py-3 hover:bg-slate-800/50"
                 >
                   <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium">
-                    {leave.name?.charAt(0)?.toUpperCase() ?? '?'}
+                    {leave.username?.charAt(0)?.toUpperCase() ?? '?'}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-white truncate">{leave.name}</p>
+                    <p className="font-medium text-white truncate">{leave.username}</p>
                     <p className="text-slate-500 text-xs">
-                      {formatDate(leave.date)}
+                      {formatDate(leave.leave_date)}
                       {leave.reason ? ` · ${leave.reason}` : ''}
                     </p>
                   </div>
