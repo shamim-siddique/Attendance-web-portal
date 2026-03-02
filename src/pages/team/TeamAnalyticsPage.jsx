@@ -69,7 +69,7 @@ export function TeamAnalyticsPage() {
           </div>
         )
       }),
-      columnHelper.accessor('present_days', {
+      columnHelper.accessor('summary.present_days', {
         header: ({ column }) => (
           <button
             type="button"
@@ -83,7 +83,7 @@ export function TeamAnalyticsPage() {
           <span className="font-medium text-emerald-400">{getValue() ?? 0}</span>
         )
       }),
-      columnHelper.accessor('half_days', {
+      columnHelper.accessor('summary.half_days', {
         header: ({ column }) => (
           <button
             type="button"
@@ -98,7 +98,7 @@ export function TeamAnalyticsPage() {
         ),
         meta: { hideOnMobile: true }
       }),
-      columnHelper.accessor('absent_days', {
+      columnHelper.accessor('summary.absent_days', {
         header: ({ column }) => (
           <button
             type="button"
@@ -112,7 +112,7 @@ export function TeamAnalyticsPage() {
           <span className="font-medium text-rose-400">{getValue() ?? 0}</span>
         )
       }),
-      columnHelper.accessor('total_work_hours', {
+      columnHelper.accessor('work_hours.total_hours', {
         header: ({ column }) => (
           <button
             type="button"
@@ -188,10 +188,10 @@ export function TeamAnalyticsPage() {
     const rows = members.map((m) => [
       m.name,
       m.email,
-      m.present_days ?? 0,
-      m.half_days ?? 0,
-      m.absent_days ?? 0,
-      m.total_work_hours != null ? Number(m.total_work_hours).toFixed(1) : 0,
+      m.summary?.present_days ?? 0,
+      m.summary?.half_days ?? 0,
+      m.summary?.absent_days ?? 0,
+      m.work_hours?.total_hours != null ? Number(m.work_hours.total_hours).toFixed(1) : 0,
       m.attendance_percentage != null
         ? Number(m.attendance_percentage).toFixed(1)
         : 0
@@ -314,7 +314,7 @@ export function TeamAnalyticsPage() {
                       {row.getVisibleCells().map((cell) => (
                         <td
                           key={cell.id}
-                          className={`px-4 py-3 text-sm ${cell.column.columnDef.meta?.hideOnMobile
+                          className={`px-4 py-3 text-white text-sm ${cell.column.columnDef.meta?.hideOnMobile
                               ? 'hidden md:table-cell'
                               : ''
                             }`}

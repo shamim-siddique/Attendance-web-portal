@@ -247,7 +247,7 @@ export function DashboardPage() {
                     </div>
                   ) : (
                     <div className="flex items-center gap-1">
-                      <button
+                      <Button
                         type="button"
                         onClick={() => handleApprove(leave.id)}
                         disabled={approvingId != null}
@@ -255,8 +255,8 @@ export function DashboardPage() {
                         title="Approve"
                       >
                         <CheckCircle2 className="w-4 h-4" />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
                         onClick={() => setRejectingId(leave.id)}
                         disabled={approvingId != null}
@@ -264,7 +264,7 @@ export function DashboardPage() {
                         title="Reject"
                       >
                         <XCircle className="w-4 h-4" />
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </li>

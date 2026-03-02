@@ -96,7 +96,7 @@ export function Sidebar({ open, onClose }) {
               }
             >
               <Icon className="w-5 h-5 shrink-0" />
-              <span className="hidden lg:inline">{label}</span>
+              <span className=" max-w-[767px]:flex md:hidden lg:inline">{label}</span>
             </NavLink>
           ))}
         </nav>

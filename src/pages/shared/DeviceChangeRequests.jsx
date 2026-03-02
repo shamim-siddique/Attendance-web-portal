@@ -82,7 +82,7 @@ export function DeviceChangeRequests() {
                     )
                 }
             }),
-            columnHelper.accessor('oldDeviceId', {
+            columnHelper.accessor('old_device_id', {
                 header: 'Old Device ID',
                 cell: ({ getValue }) => (
                     <span className="text-slate-400 truncate max-w-[120px] block" title={getValue()}>
@@ -90,7 +90,7 @@ export function DeviceChangeRequests() {
                     </span>
                 )
             }),
-            columnHelper.accessor('newDeviceId', {
+            columnHelper.accessor('new_device_id', {
                 header: 'New Device ID',
                 cell: ({ getValue }) => (
                     <span className="text-slate-300 truncate max-w-[120px] block font-mono text-xs" title={getValue()}>
@@ -107,7 +107,7 @@ export function DeviceChangeRequests() {
                 ),
                 meta: { hideOnMobile: true }
             }),
-            columnHelper.accessor('createdAt', {
+            columnHelper.accessor('created_at', {
                 header: ({ column }) => (
                     <button
                         type="button"
@@ -312,7 +312,7 @@ export function DeviceChangeRequests() {
                                             {row.getVisibleCells().map((cell) => (
                                                 <td
                                                     key={cell.id}
-                                                    className={`px-4 py-3 text-sm align-middle ${cell.column.columnDef.meta?.hideOnMobile ? 'hidden md:table-cell' : ''
+                                                    className={`px-4 py-3 text-white text-sm align-middle ${cell.column.columnDef.meta?.hideOnMobile ? 'hidden md:table-cell' : ''
                                                         }`}
                                                 >
                                                     {flexRender(
@@ -340,7 +340,7 @@ export function DeviceChangeRequests() {
                 title="Reject Device Change Request"
                 subtitle={
                     rejectTarget
-                        ? `${rejectTarget.user?.username || 'Unknown'} · ${rejectTarget.newDeviceId}`
+                        ? `${rejectTarget.user?.username || 'Unknown'} · ${rejectTarget.new_device_id}`
                         : ''
                 }
                 footer={

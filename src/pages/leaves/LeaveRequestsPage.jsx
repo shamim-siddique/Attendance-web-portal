@@ -311,7 +311,7 @@ export function LeaveRequestsPage() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-indigo-500"
           >
-            <option value="all">All Statuses</option>
+            <option value="all">All Status</option>
             <option value="pending">Pending</option>
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
@@ -387,7 +387,7 @@ export function LeaveRequestsPage() {
                       {row.getVisibleCells().map((cell) => (
                         <td
                           key={cell.id}
-                          className={`px-4 py-3 text-sm ${cell.column.columnDef.meta?.hideOnMobile
+                          className={`px-4 py-3 text-white text-sm ${cell.column.columnDef.meta?.hideOnMobile
                               ? 'hidden md:table-cell'
                               : ''
                             } ${cell.column.columnDef.meta?.hideOnLg
