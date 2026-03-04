@@ -145,7 +145,7 @@ export function TeamAnalyticsPage() {
           const textColor =
             n >= 80 ? 'text-emerald-400' : n >= 50 ? 'text-amber-400' : 'text-rose-400'
           return (
-            <div className="flex items-center gap-2 min-w-[100px]">
+            <div className="flex items-center gap-2 min-w-25">
               <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full ${barColor}`}
@@ -173,7 +173,7 @@ export function TeamAnalyticsPage() {
     initialState: { pagination: { pageSize: 10 } }
   })
 
-  const handleApplyDates = () => refetch()
+  const handleApplyDates = () => refetch() // This will use the current startDate and endDate values
 
   const handleExportCSV = () => {
     const headers = [

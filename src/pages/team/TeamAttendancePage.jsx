@@ -213,7 +213,7 @@ export function TeamAttendancePage() {
   }, [overrideRecord])
 
   const handleApplyDates = () => {
-    refetch()
+    refetch() // This will use the current startDate and endDate values
   }
 
   const handleSaveOverride = async () => {

@@ -21,8 +21,13 @@ function getPageTitle(pathname) {
 export function TopBar({ onMenuClick }) {
   const location = useLocation()
   const { user, isAdmin, isManager, logout } = useAuth()
-  const initial = user?.name?.charAt(0)?.toUpperCase() ?? '?'
+  
+  const displayName =
+    user?.username ||
+    user?.email?.split('@')[0] ||
+    'User'
 
+  const initial = displayName.charAt(0).toUpperCase()
   return (
     <header className="h-16 bg-slate-900 border-b border-slate-800 flex items-center px-4 gap-4 shrink-0">
       <button
@@ -43,7 +48,7 @@ export function TopBar({ onMenuClick }) {
           {initial}
         </div>
         <span className="text-slate-300 text-sm font-medium hidden sm:inline truncate max-w-[120px]">
-          {user?.name}
+          {user?.username}
         </span>
         {isAdmin && <Badge variant="rose">Admin</Badge>}
         {!isAdmin && isManager && <Badge variant="violet">Manager</Badge>}

@@ -283,7 +283,7 @@ export function DeviceChangeRequests() {
                     />
                 ) : (
                     <>
-                        <div className="overflow-x-auto">
+                        <div className="overflow-x-auto scrollbar-minimal">
                             <table className="w-full">
                                 <thead>
                                     {table.getHeaderGroups().map((headerGroup) => (

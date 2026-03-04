@@ -476,7 +476,7 @@ export function UserLocationsPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-white truncate">{m.name}</p>
-                  <p className="text-slate-500 text-xs truncate">{m.email}</p>
+                  <p className="text-white text-xs truncate">{m.email}</p>
                 </div>
                 {locationSetIds.has(m.id) && (
                   <Badge variant="emerald" className="shrink-0">

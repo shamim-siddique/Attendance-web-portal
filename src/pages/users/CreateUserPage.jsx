@@ -13,7 +13,7 @@ const ROLE_OPTIONS = [
 ]
 
 export function CreateUserPage() {
-  const { isAdmin } = useAuth()
+  const { isAdmin, user } = useAuth()
   const [members, setMembers] = useState([])
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -49,8 +49,6 @@ export function CreateUserPage() {
     (m) => m.roles?.includes('manager') || m.roles?.includes('admin')
   )
   
-  console.log('CreateUserPage: All members:', members)
-  console.log('CreateUserPage: Manager options:', managerOptions)
   const visibleRoleOptions = isAdmin
     ? ROLE_OPTIONS
     : ROLE_OPTIONS.filter((r) => r.value !== 'admin')
@@ -68,10 +66,44 @@ export function CreateUserPage() {
       setError('Select at least one role.')
       return
     }
+    
+    // Validate role selection
+    const hasAdmin = selectedRoles.includes('admin')
+    const hasManager = selectedRoles.includes('manager')
+    const hasEmployee = selectedRoles.includes('employee')
+    
+    // Only admins can assign admin role
+    if (hasAdmin && !isAdmin) {
+      setError('Only admins can assign admin role.')
+      return
+    }
+    
+    // Filter roles based on permissions
+    let finalRoles = selectedRoles
+    if (!isAdmin) {
+      // Non-admins cannot assign admin role
+      finalRoles = finalRoles.filter(role => role !== 'admin')
+    }
+    
     setLoading(true)
     try {
-      const payload = { name: name.trim(), email: email.trim(), roles: selectedRoles }
-      if (isAdmin && selectedManagerId) payload.manager_id = selectedManagerId
+      const payload = { 
+        name: name.trim(), 
+        email: email.trim(), 
+        roles: finalRoles
+      }
+      
+      // Add manager_id based on user role
+      if (isAdmin) {
+        // Admins can assign any manager or leave it null
+        if (selectedManagerId) {
+          payload.manager_id = selectedManagerId
+        }
+      } else {
+        // Non-admins: new users report to them
+        payload.manager_id = user?.id
+      }
+      
       await createUser(payload)
       setSuccess(name.trim())
       setName('')

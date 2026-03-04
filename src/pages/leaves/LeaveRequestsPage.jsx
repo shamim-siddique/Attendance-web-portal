@@ -270,7 +270,7 @@ export function LeaveRequestsPage() {
     }
   }
 
-  const handleApplyDates = () => refetch()
+  const handleApplyDates = () => refetch() // This will use the current startDate, endDate, and statusFilter values
 
   return (
     <div className="space-y-6">

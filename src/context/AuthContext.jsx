@@ -53,6 +53,12 @@ export function AuthProvider({ children }) {
     }
     try {
       const decoded = jwtDecode(token)
+      console.log('DEBUG: Current JWT token fields:', Object.keys(decoded))
+      console.log('DEBUG: Current JWT token:', decoded)
+      console.log('DEBUG: Has username:', 'username' in decoded)
+      console.log('DEBUG: Has email:', 'email' in decoded)
+      console.log('DEBUG: Username value:', decoded.username)
+      console.log('DEBUG: Email value:', decoded.email)
       if (decoded.exp * 1000 < Date.now()) {
         localStorage.clear()
         setLoading(false)

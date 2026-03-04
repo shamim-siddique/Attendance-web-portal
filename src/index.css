@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+.scrollbar-minimal {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+
+.scrollbar-minimal::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+  background: rgba(3, 32, 249, 0.872);
+}

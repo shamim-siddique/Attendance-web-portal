@@ -30,8 +30,12 @@ const navItems = [
 
 export function Sidebar({ open, onClose }) {
   const { user, isAdmin, isManager, logout } = useAuth()
-  const initial = user?.name?.charAt(0)?.toUpperCase() ?? '?'
+  const displayName =
+    user?.username ||
+    user?.email?.split('@')[0] ||
+    'User'
 
+  const initial = displayName.charAt(0).toUpperCase()
   return (
     <>
       {/* Mobile backdrop */}
@@ -46,7 +50,7 @@ export function Sidebar({ open, onClose }) {
       <aside
         className={`
           fixed md:static inset-y-0 left-0 z-50
-          w-72 md:w-16 lg:w-60
+          w-70 md:w-16 lg:w-60
           bg-slate-900 border-r border-slate-800
           flex flex-col
           transform transition-transform duration-200 ease-out
@@ -79,7 +83,7 @@ export function Sidebar({ open, onClose }) {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 overflow-y-auto py-4 px-2">
+        <nav className="flex-1 py-4 px-2">
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
@@ -108,8 +112,8 @@ export function Sidebar({ open, onClose }) {
               {initial}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-white font-medium truncate">{user?.name}</p>
-              <p className="text-slate-500 text-xs truncate">{user?.email}</p>
+              <p className="text-white font-medium truncate">{user?.username}</p>
+              <p className="text-white text-xs truncate">{user?.email}</p>
             </div>
           </div>
           <Button

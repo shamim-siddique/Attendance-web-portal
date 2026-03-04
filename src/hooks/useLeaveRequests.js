@@ -24,7 +24,7 @@ export function useLeaveRequests(startDate, endDate, statusFilter) {
 
   useEffect(() => {
     fetch()
-  }, [startDate, endDate, statusFilter])
+  }, []) // Only fetch on initial mount
 
   return { data, loading, error, refetch: fetch }
 }

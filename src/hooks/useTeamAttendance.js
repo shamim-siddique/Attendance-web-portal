@@ -24,7 +24,7 @@ export function useTeamAttendance(startDate, endDate) {
 
   useEffect(() => {
     fetch()
-  }, [startDate, endDate])
+  }, []) // Only fetch on initial mount
 
   return { data, loading, error, refetch: fetch }
 }
