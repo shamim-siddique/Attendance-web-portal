@@ -1,47 +1,53 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { GoogleLogin } from '@react-oauth/google'
-import { Building2, ShieldCheck, AlertCircle } from 'lucide-react'
-import { useAuth } from '../../context/AuthContext'
-import { googleLogin } from '../../api/services/auth.service'
-import { Spinner } from '../../components/ui/Spinner'
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
+import { Building2, ShieldCheck, AlertCircle } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { googleLogin } from "../../api/services/auth.service";
+import { Spinner } from "../../components/ui/Spinner";
 
 export function LoginPage() {
-  const navigate = useNavigate()
-  const { login, isAdminOrManager, loading: authLoading } = useAuth()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const navigate = useNavigate();
+  const { login, isAdminOrManager, loading: authLoading } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (authLoading) return
-    if (isAdminOrManager) navigate('/dashboard')
-  }, [authLoading, isAdminOrManager, navigate])
+    if (authLoading) return;
+    if (isAdminOrManager) navigate("/dashboard");
+  }, [authLoading, isAdminOrManager, navigate]);
 
   const handleSuccess = async (credentialResponse) => {
-    const google_token = credentialResponse.credential
-    setLoading(true)
-    setError('')
+    const googleToken = credentialResponse.credential;
+    setLoading(true);
+    setError("");
     try {
-      const { data } = await googleLogin(google_token)
-      login(data.access_token, data.refresh_token)
-      navigate('/dashboard')
+      const response = await googleLogin(googleToken);
+      // API returns { success, data: { accessToken, refreshToken } }
+      const tokens = response.data.data;
+      login(tokens.accessToken, tokens.refreshToken);
+      navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.')
+      setError(
+        err.response?.data?.error?.message ||
+          err.response?.data?.message ||
+          "Login failed. Please try again.",
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleError = () => {
-    setError('Google sign-in failed. Please try again.')
-  }
+    setError("Google sign-in failed. Please try again.");
+  };
 
   if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <Spinner size="lg" />
       </div>
-    )
+    );
   }
 
   return (
@@ -60,7 +66,7 @@ export function LoginPage() {
         style={{
           backgroundImage: `linear-gradient(rgba(30,41,59,.15) 1px, transparent 1px),
             linear-gradient(90deg, rgba(30,41,59,.15) 1px, transparent 1px)`,
-          backgroundSize: '24px 24px'
+          backgroundSize: "24px 24px",
         }}
         aria-hidden="true"
       />
@@ -97,7 +103,6 @@ export function LoginPage() {
               size="large"
               text="continue_with"
               shape="rectangular"
-              width="320"
             />
           </div>
 
@@ -115,5 +120,5 @@ export function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

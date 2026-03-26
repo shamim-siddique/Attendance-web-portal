@@ -21,19 +21,19 @@ export function StatCard({
       onClick={onClick}
       role={isClickable ? 'button' : undefined}
       className={`
-        bg-slate-900 border border-slate-800 rounded-2xl p-6
-        ${isClickable ? 'cursor-pointer hover:border-slate-700 transition-all' : ''}
+        bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-6
+        ${isClickable ? 'cursor-pointer hover:border-gray-300 dark:hover:border-slate-700 transition-all' : ''}
       `}
     >
       {loading ? (
         <>
-          <div className="h-10 w-24 bg-slate-800 rounded animate-pulse" />
-          <div className="h-4 w-32 bg-slate-800 rounded mt-2 animate-pulse" />
+          <div className="h-10 w-24 bg-gray-100 dark:bg-slate-800 rounded animate-pulse" />
+          <div className="h-4 w-32 bg-gray-100 dark:bg-slate-800 rounded mt-2 animate-pulse" />
         </>
       ) : (
         <>
           <div className="flex items-start justify-between gap-2">
-            <span className="text-3xl font-bold text-white">{value}</span>
+            <span className="text-3xl font-bold text-gray-900 dark:text-white">{value}</span>
             {Icon && (
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
@@ -44,8 +44,8 @@ export function StatCard({
               </div>
             )}
           </div>
-          <p className="text-slate-400 text-sm mt-1">{label}</p>
-          {sub && <p className="text-slate-500 text-xs mt-0.5">{sub}</p>}
+          <p className="text-gray-600 dark:text-slate-400 text-sm mt-1">{label}</p>
+          {sub && <p className="text-gray-500 dark:text-slate-500 text-xs mt-0.5">{sub}</p>}
         </>
       )}
     </div>

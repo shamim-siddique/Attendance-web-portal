@@ -28,7 +28,7 @@ export function LocationMap({ latitude, longitude, height = '200px', showControl
 
   if (!latitude || !longitude) {
     return (
-      <div className="flex items-center justify-center bg-slate-800 rounded-lg text-slate-500 text-sm" style={{ height }}>
+      <div className="flex items-center justify-center bg-gray-100 dark:bg-slate-800 rounded-lg text-gray-600 dark:text-slate-500 text-sm" style={{ height }}>
         No location data
       </div>
     )
@@ -36,7 +36,7 @@ export function LocationMap({ latitude, longitude, height = '200px', showControl
 
   return (
     <div className="space-y-2">
-      <div className="rounded-lg overflow-hidden border border-slate-700" style={{ height }}>
+      <div className="rounded-lg overflow-hidden border border-gray-300 dark:border-slate-700" style={{ height }}>
         <MapContainer
           center={[parseFloat(latitude), parseFloat(longitude)]}
           zoom={15}
@@ -67,7 +67,7 @@ export function LocationMap({ latitude, longitude, height = '200px', showControl
               className={`px-2 py-1 text-xs rounded transition-colors ${
                 tileLayer === key
                   ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               {layer.name}
@@ -81,12 +81,12 @@ export function LocationMap({ latitude, longitude, height = '200px', showControl
 
 export function CompactLocationMap({ latitude, longitude }) {
   if (!latitude || !longitude) {
-    return <span className="text-slate-500">—</span>
+    return <span className="text-gray-600 dark:text-slate-500">—</span>
   }
   
   return (
     <div className="space-y-1">
-      <div className="rounded-lg overflow-hidden border border-slate-700" style={{ height: '120px' }}>
+      <div className="rounded-lg overflow-hidden border border-gray-300 dark:border-slate-700" style={{ height: '120px' }}>
         <MapContainer
           center={[parseFloat(latitude), parseFloat(longitude)]}
           zoom={14}
@@ -101,7 +101,7 @@ export function CompactLocationMap({ latitude, longitude }) {
           <Marker position={[parseFloat(latitude), parseFloat(longitude)]} />
         </MapContainer>
       </div>
-      <div className="text-xs text-slate-400 text-center">
+      <div className="text-xs text-gray-600 dark:text-slate-400 text-center">
         {parseFloat(latitude).toFixed(4)}, {parseFloat(longitude).toFixed(4)}
       </div>
     </div>

@@ -1,23 +1,23 @@
-import api from '../axios'
+import api from "../axios";
 
+// List leave requests with filters
 export const getTeamLeaves = (startDate, endDate, status = null) => {
-  const params = { startDate, endDate }
-  if (status && status !== 'all') params.status = status
-  console.log('Making API call to /web/leaves/team-leaves with params:', params)
-  return api.get('/web/leaves/team-leaves', { params })
-}
+  const params = { startDate, endDate };
+  // API expects uppercase status: PENDING, APPROVED, REJECTED, CANCELLED
+  if (status && status !== "all") {
+    params.status = status.toUpperCase();
+  }
+  return api.get("/web/leave-requests", { params });
+};
 
-export const approveLeave = (leaveId) =>
-  api.patch(`/web/leaves/${leaveId}/approve`, {})
+// Get single leave request
+export const getLeaveRequest = (leaveId) =>
+  api.get(`/web/leave-requests/${leaveId}`);
 
-export const rejectLeave = (leaveId, rejection_reason) =>
-  api.patch(`/web/leaves/${leaveId}/reject`, { rejection_reason })
+// Approve leave request (actionNote is optional)
+export const approveLeave = (leaveId, actionNote = "") =>
+  api.patch(`/web/leave-requests/${leaveId}/approve`, { actionNote });
 
-export const requestLeave = (payload) =>
-  api.post('/web/leaves/request', payload)
-
-export const getMyLeaves = () =>
-  api.get('/web/leaves/my-leaves')
-
-export const deleteLeave = (leaveId) =>
-  api.delete(`/web/leaves/${leaveId}`)
+// Reject leave request (actionNote is required)
+export const rejectLeave = (leaveId, actionNote) =>
+  api.patch(`/web/leave-requests/${leaveId}/reject`, { actionNote });

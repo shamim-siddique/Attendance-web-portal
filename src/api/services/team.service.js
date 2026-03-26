@@ -1,28 +1,59 @@
-import api from '../axios'
+import api from "../axios";
 
-export const getTeamMembers = () => {
-  console.log('Making API call to /web/team/members')
-  return api.get('/web/team/members')
-}
+// Users list (replaces getTeamMembers)
+export const getTeamMembers = () => api.get("/web/users");
 
-export const getTeamAttendance = (startDate, endDate) => {
-  console.log('Making API call to /web/team/attendance with params:', { startDate, endDate })
-  return api.get('/web/team/attendance', { params: { startDate, endDate } })
-}
+// Alias for backwards compatibility
+export const getUsers = getTeamMembers;
 
-export const overrideAttendance = (payload) =>
-  api.post('/web/team/attendance/override', payload)
+// Dashboard overview (includes attendance summary, pending counts)
+export const getDashboardOverview = (startDate, endDate) =>
+  api.get("/web/dashboard/overview", { params: { startDate, endDate } });
 
-export const getTeamAnalytics = (startDate, endDate) => {
-  console.log('Making API call to /web/team/analytics with params:', { startDate, endDate })
-  return api.get('/web/team/analytics', { params: { startDate, endDate } })
-}
+// Row-level attendance records for the attendance table
+export const getTeamAttendance = ({
+  startDate,
+  endDate,
+  status,
+  page = 1,
+  limit = 20,
+} = {}) =>
+  api.get("/web/attendance/records", {
+    params: {
+      startDate,
+      endDate,
+      status: status || undefined,
+      page,
+      limit,
+    },
+  });
 
+// User attendance overview
+export const getUserAttendanceOverview = (userId, startDate, endDate) =>
+  api.get(`/web/users/${userId}/attendance/overview`, {
+    params: { startDate, endDate },
+  });
+
+// Attendance regularization (replaces overrideAttendance)
+export const overrideAttendance = (userId, date, payload) =>
+  api.put(`/web/users/${userId}/attendance-regularizations/${date}`, payload);
+
+// Delete attendance regularization
+export const deleteRegularization = (userId, date) =>
+  api.delete(`/web/users/${userId}/attendance-regularizations/${date}`);
+
+// Team analytics - uses attendance overview since there's no dedicated analytics endpoint
+export const getTeamAnalytics = (startDate, endDate) =>
+  api.get("/web/attendance/overview", {
+    params: { startDate, endDate, limit: 100 },
+  });
+
+// Device change requests
 export const getDeviceChangeRequests = () =>
-  api.get('/web/team/device-change-requests')
+  api.get("/web/device-change-requests");
 
-export const approveDeviceChangeRequest = (requestId) =>
-  api.post(`/web/team/device-change-requests/${requestId}/approve`, {})
+export const approveDeviceChangeRequest = (requestId, actionNote = "") =>
+  api.patch(`/web/device-change-requests/${requestId}/approve`, { actionNote });
 
-export const rejectDeviceChangeRequest = (requestId, reviewComment = '') =>
-  api.post(`/web/team/device-change-requests/${requestId}/reject`, { reviewComment })
+export const rejectDeviceChangeRequest = (requestId, actionNote) =>
+  api.patch(`/web/device-change-requests/${requestId}/reject`, { actionNote });

@@ -59,8 +59,8 @@ export function TeamMapPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      <div className="bg-slate-800 border-b border-slate-700">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+      <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -69,8 +69,8 @@ export function TeamMapPage() {
                 Back
               </Button>
               <div>
-                <h1 className="text-xl font-semibold text-white">User Location</h1>
-                <div className="flex items-center gap-4 text-sm text-slate-400 mt-1">
+                <h1 className="text-xl font-semibold text-gray-900 dark:text-white">User Location</h1>
+                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-slate-400 mt-1">
                   {user && (
                     <div className="flex items-center gap-1">
                       <User className="w-3 h-3" />
@@ -93,28 +93,12 @@ export function TeamMapPage() {
             
             <div className="flex gap-2">
               <button
-                onClick={() => setTileLayer('street')}
-                className={`px-3 py-2 text-sm rounded-lg transition-colors ${
-                  tileLayer === 'street'
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                }`}
-              >
-                Street
-              </button>
-              <button
-                onClick={() => setTileLayer('satellite')}
-                className={`px-3 py-2 text-sm rounded-lg transition-colors ${
-                  tileLayer === 'satellite'
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                }`}
-              >
-                Satellite
-              </button>
-              <button
                 onClick={() => setShowCustomInput(!showCustomInput)}
-                className="px-3 py-2 text-sm rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+                className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                  showCustomInput
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
+                }`}
               >
                 <MapPin className="w-3 h-3 mr-1" />
                 Set Location
@@ -126,7 +110,7 @@ export function TeamMapPage() {
 
       <div className="p-4">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
             <LocationMap 
               latitude={lat} 
               longitude={lng} 
@@ -137,11 +121,11 @@ export function TeamMapPage() {
           </div>
           
           {showCustomInput && (
-            <div className="mt-4 bg-slate-800 rounded-xl border border-slate-700 p-4">
-              <h3 className="text-lg font-semibold text-white mb-4">Set Custom Location</h3>
+            <div className="mt-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Set Custom Location</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Latitude
                   </label>
                   <input
@@ -150,11 +134,11 @@ export function TeamMapPage() {
                     value={customLat}
                     onChange={(e) => setCustomLat(e.target.value)}
                     placeholder="28.613939"
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Longitude
                   </label>
                   <input
@@ -163,7 +147,7 @@ export function TeamMapPage() {
                     value={customLng}
                     onChange={(e) => setCustomLng(e.target.value)}
                     placeholder="77.209021"
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -179,7 +163,7 @@ export function TeamMapPage() {
               </div>
               
               <div className="mt-4">
-                <h4 className="text-sm font-medium text-slate-300 mb-2">Quick Presets</h4>
+                <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Quick Presets</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {[
                     { name: 'Delhi', lat: '28.613939', lng: '77.209021' },
@@ -193,7 +177,7 @@ export function TeamMapPage() {
                         setCustomLat(city.lat)
                         setCustomLng(city.lng)
                       }}
-                      className="px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 transition-colors"
+                      className="px-2 py-1 text-xs bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                     >
                       {city.name}
                     </button>
@@ -204,15 +188,15 @@ export function TeamMapPage() {
           )}
           
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
-              <h3 className="text-sm font-medium text-slate-400 mb-2">Coordinates</h3>
-              <p className="text-white font-mono">
+            <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4">
+              <h3 className="text-sm font-medium text-gray-600 dark:text-slate-400 mb-2">Coordinates</h3>
+              <p className="text-gray-900 dark:text-white font-mono">
                 {parseFloat(lat).toFixed(6)}, {parseFloat(lng).toFixed(6)}
               </p>
             </div>
             
-            <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
-              <h3 className="text-sm font-medium text-slate-400 mb-2">External Maps</h3>
+            <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4">
+              <h3 className="text-sm font-medium text-gray-600 dark:text-slate-400 mb-2">External Maps</h3>
               <div className="flex gap-2">
                 <a
                   href={`https://www.google.com/maps/@${lat},${lng},18z/data=!3m1!1e3`}
@@ -234,8 +218,8 @@ export function TeamMapPage() {
               </div>
             </div>
             
-            <div className="bg-slate-800 rounded-lg border border-slate-700 p-4">
-              <h3 className="text-sm font-medium text-slate-400 mb-2">Quick Actions</h3>
+            <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4">
+              <h3 className="text-sm font-medium text-gray-600 dark:text-slate-400 mb-2">Quick Actions</h3>
               <button
                 onClick={() => navigator.clipboard.writeText(`${lat}, ${lng}`)}
                 className="text-indigo-400 hover:text-indigo-300 text-sm underline"

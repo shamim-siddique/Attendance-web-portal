@@ -1,7 +1,10 @@
-import api from '../axios'
+import api from "../axios";
 
-export const googleLogin = (google_token) =>
-  api.post('/web/auth/google', { google_token })
+export const googleLogin = (googleToken) =>
+  api.post("/web/auth/google/login", { googleToken });
 
-export const refreshTokens = (refresh_token) =>
-  api.post('/web/auth/refresh', { refresh_token })
+export const refreshTokens = (refreshToken) =>
+  api.post("/web/auth/refresh", { refreshToken });
+
+export const logout = (refreshToken) =>
+  api.post("/web/auth/logout", { refreshToken });

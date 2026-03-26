@@ -1,6 +1,10 @@
 export const formatDate = (dateStr) => {
   if (!dateStr) return '—'
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
+  const value = String(dateStr).includes('T')
+    ? new Date(dateStr)
+    : new Date(`${dateStr}T00:00:00`)
+  if (Number.isNaN(value.getTime())) return '—'
+  return value.toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'short',
     year: 'numeric'

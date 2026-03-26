@@ -1,77 +1,70 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-import { jwtDecode } from 'jwt-decode'
+import { createContext, useContext, useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 
-const AuthContext = createContext(null)
+const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [roles, setRoles] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(null);
+  const [roles, setRoles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const isAdmin = roles.includes('admin')
-  const isManager = roles.includes('manager')
-  const isAdminOrManager = isAdmin || isManager
+  const isAdmin = roles.includes("ADMIN");
+  const isManager = roles.includes("MANAGER");
+  const isAdminOrManager = isAdmin || isManager;
 
-  const login = (access_token, refresh_token) => {
-    localStorage.setItem('access_token', access_token)
-    localStorage.setItem('refresh_token', refresh_token)
-    const decoded = jwtDecode(access_token)
-    setUser(decoded)
-    setRoles(decoded.roles || [])
-  }
+  const login = (accessToken, refreshToken) => {
+    localStorage.setItem("access_token", accessToken);
+    localStorage.setItem("refresh_token", refreshToken);
+    const decoded = jwtDecode(accessToken);
+    setUser(decoded);
+    setRoles(decoded.roles || []);
+  };
 
   const logout = async () => {
     try {
-      const refresh_token = localStorage.getItem('refresh_token')
-      const access_token = localStorage.getItem('access_token')
-      if (refresh_token) {
-        // Attempt backend logout (if exists) to revoke refresh token
-        await fetch(import.meta.env.VITE_API_BASE_URL + '/web/auth/logout', {
-          method: 'POST',
+      const refreshToken = localStorage.getItem("refresh_token");
+      const accessToken = localStorage.getItem("access_token");
+      if (refreshToken) {
+        await fetch(import.meta.env.VITE_API_BASE_URL + "/web/auth/logout", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'X-Client-Type': 'web',
-            'Authorization': 'Bearer ' + access_token
+            "Content-Type": "application/json",
+            "X-Client-Type": "web",
+            Authorization: "Bearer " + accessToken,
           },
-          body: JSON.stringify({ refresh_token })
-        }).catch(() => { })
+          body: JSON.stringify({ refreshToken }),
+        }).catch(() => {});
       }
     } finally {
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
-      setUser(null)
-      setRoles([])
-      window.location.href = '/login'
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      setUser(null);
+      setRoles([]);
+      window.location.href = "/login";
     }
-  }
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
+    const token = localStorage.getItem("access_token");
     if (!token) {
-      setLoading(false)
-      return
+      setLoading(false);
+      return;
     }
     try {
-      const decoded = jwtDecode(token)
-      console.log('DEBUG: Current JWT token fields:', Object.keys(decoded))
-      console.log('DEBUG: Current JWT token:', decoded)
-      console.log('DEBUG: Has username:', 'username' in decoded)
-      console.log('DEBUG: Has email:', 'email' in decoded)
-      console.log('DEBUG: Username value:', decoded.username)
-      console.log('DEBUG: Email value:', decoded.email)
+      const decoded = jwtDecode(token);
       if (decoded.exp * 1000 < Date.now()) {
-        localStorage.clear()
-        setLoading(false)
-        return
+        localStorage.clear();
+        setLoading(false);
+        return;
       }
-      setUser(decoded)
-      setRoles(decoded.roles || [])
+      setUser(decoded);
+      setRoles(decoded.roles || []);
     } catch (e) {
-      localStorage.clear()
+      localStorage.clear();
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -83,16 +76,16 @@ export function AuthProvider({ children }) {
         isAdminOrManager,
         loading,
         login,
-        logout
+        logout,
       }}
     >
       {children}
     </AuthContext.Provider>
-  )
+  );
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
-  return ctx
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
 }

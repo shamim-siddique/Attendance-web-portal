@@ -1,24 +1,154 @@
 @import "tailwindcss";
 
-.scrollbar-minimal {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.2) transparent;
+/* Dark mode styles */
+.dark {
+  color-scheme: dark;
 }
+
+/* Light mode background colors */
+.bg-white {
+  background-color: white;
+}
+
+.bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+.bg-gray-100 {
+  background-color: #f3f4f6;
+}
+
+/* Dark mode background colors */
+.dark .bg-white {
+  background-color: #0f172a;
+}
+
+.dark .bg-gray-50 {
+  background-color: #1e293b;
+}
+
+.dark .bg-gray-100 {
+  background-color: #334155;
+}
+
+/* Light mode text colors */
+.text-gray-900 {
+  color: #111827;
+}
+
+.text-gray-800 {
+  color: #1f2937;
+}
+
+.text-gray-700 {
+  color: #374151;
+}
+
+.text-gray-600 {
+  color: #4b5563;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}
+
+/* Dark mode text colors */
+.dark .text-gray-900 {
+  color: #f9fafb;
+}
+
+.dark .text-gray-800 {
+  color: #f3f4f6;
+}
+
+.dark .text-gray-700 {
+  color: #e5e7eb;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db;
+}
+
+.dark .text-gray-500 {
+  color: #9ca3af;
+}
+
+/* Border colors */
+.border-gray-200 {
+  border-color: #e5e7eb;
+}
+
+.border-gray-300 {
+  border-color: #d1d5db;
+}
+
+.dark .border-gray-200 {
+  border-color: #374151;
+}
+
+.dark .border-gray-300 {
+  border-color: #4b5563;
+}
+
+/* Hover states */
+.hover\:bg-gray-100:hover {
+  background-color: #f3f4f6;
+}
+
+.hover\:bg-gray-200:hover {
+  background-color: #e5e7eb;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: #374151;
+}
+
+.dark .hover\:bg-gray-200:hover {
+  background-color: #4b5563;
+}
+
+
+
+.scrollbar-minimal {
+
+  scrollbar-width: thin;
+
+  scrollbar-color: rgba(255,255,255,0.2) transparent;
+
+}
+
+
 
 .scrollbar-minimal::-webkit-scrollbar {
+
   width: 4px;
+
 }
+
+
 
 .scrollbar-minimal::-webkit-scrollbar-track {
+
   background: transparent;
+
 }
+
+
 
 .scrollbar-minimal::-webkit-scrollbar-thumb {
+
   background: rgba(255,255,255,0.2);
+
   border-radius: 9999px;
+
   transition: background 0.2s ease;
+
 }
 
+
+
 .scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+
   background: rgba(3, 32, 249, 0.872);
+
 }
