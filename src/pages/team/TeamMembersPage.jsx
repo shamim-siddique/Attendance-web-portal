@@ -32,9 +32,22 @@ const roleVariant = (role) => {
 };
 
 export function TeamMembersPage() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const { data: members, loading, error } = useTeamMembers();
   const [globalFilter, setGlobalFilter] = useState("");
+
+  // Filter out the logged-in user from the members list
+  const filteredMembers = useMemo(() => {
+    if (!user || !members) return members;
+    return members.filter((member) => {
+      // Filter by ID if available, otherwise by email
+      if (user.userId && member.id) {
+        return member.id !== user.userId;
+      }
+      // Fallback to email comparison
+      return member.email !== user.email;
+    });
+  }, [members, user]);
 
   const SortIcon = ({ column }) => {
     const sorted = column.getIsSorted();
@@ -137,7 +150,7 @@ export function TeamMembersPage() {
   );
 
   const table = useReactTable({
-    data: members,
+    data: filteredMembers,
     columns,
     state: { globalFilter },
     onGlobalFilterChange: setGlobalFilter,
@@ -148,7 +161,7 @@ export function TeamMembersPage() {
     initialState: { pagination: { pageSize: 10 } },
   });
 
-  const activeCount = members.filter((m) => m.is_active).length;
+  const activeCount = filteredMembers.filter((m) => m.is_active).length;
 
   return (
     <div className="space-y-6">
@@ -171,7 +184,7 @@ export function TeamMembersPage() {
 
       <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <p className="text-gray-600 dark:text-slate-400 text-sm">
-          {members.length} members total · {activeCount} active
+          {filteredMembers.length} members total · {activeCount} active
         </p>
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-500" />
@@ -200,7 +213,7 @@ export function TeamMembersPage() {
               ))}
             </div>
           ))
-        ) : members.length === 0 ? (
+        ) : filteredMembers.length === 0 ? (
           <EmptyState icon={Users} title="No team members found." />
         ) : (
           <>

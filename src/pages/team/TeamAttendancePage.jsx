@@ -370,7 +370,7 @@
 //               key={index}
 //               className="flex gap-4 p-4 border-b border-gray-200 dark:border-slate-800"
 //             >
-//               {[...Array(9)].map((__, skeletonIndex) => (
+//               {[...Array(8)].map((__, skeletonIndex) => (
 //                 <div
 //                   key={skeletonIndex}
 //                   className="h-6 flex-1 bg-gray-100 dark:bg-slate-700 rounded animate-pulse"
@@ -510,7 +510,7 @@
 //                         <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-400">
 //                           {record.regularization?.reason ? (
 //                             <p
-//                               className="max-w-[280px] truncate"
+//                               className="max-w-70 truncate"
 //                               title={record.regularization.reason}
 //                             >
 //                               {record.regularization.reason}
@@ -669,7 +669,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
-  MapPinned,
   PencilLine,
 } from "lucide-react";
 import { useTeamAttendance } from "../../hooks/useTeamAttendance";
@@ -748,16 +747,6 @@ const deriveOverrideStatus = (record) => {
 const canRegularizeRecord = (record, today) =>
   record?.day_type === "workingDay" && record?.punch_date < today;
 
-const getMapLink = (record) => {
-  const params = new URLSearchParams({
-    lat: String(record.latitude),
-    lng: String(record.longitude),
-    user: record.username || "Unknown User",
-    date: record.punch_date || "",
-  });
-
-  return `/team/map?${params.toString()}`;
-};
 
 export function TeamAttendancePage() {
   const today = getToday();
@@ -1034,7 +1023,7 @@ export function TeamAttendancePage() {
               key={index}
               className="flex gap-4 p-4 border-b border-gray-200 dark:border-slate-800"
             >
-              {[...Array(9)].map((__, skeletonIndex) => (
+              {[...Array(8)].map((__, skeletonIndex) => (
                 <div
                   key={skeletonIndex}
                   className="h-6 flex-1 bg-gray-100 dark:bg-slate-700 rounded animate-pulse"
@@ -1073,9 +1062,6 @@ export function TeamAttendancePage() {
                       Status
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-slate-500">
-                      Location
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-slate-500">
                       Action
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-slate-500">
@@ -1087,8 +1073,6 @@ export function TeamAttendancePage() {
                 <tbody>
                   {attendance.map((record) => {
                     const canRegularize = canRegularizeRecord(record, today);
-                    const hasLocation =
-                      record.latitude != null && record.longitude != null;
 
                     return (
                       <tr
@@ -1138,21 +1122,6 @@ export function TeamAttendancePage() {
                           </Badge>
                         </td>
 
-                        <td className="px-4 py-3 text-sm">
-                          {hasLocation ? (
-                            <Link
-                              to={getMapLink(record)}
-                              className="inline-flex items-center gap-1 text-indigo-600 dark:text-indigo-400 hover:underline"
-                            >
-                              <MapPinned className="w-4 h-4" />
-                              View Map
-                            </Link>
-                          ) : (
-                            <span className="text-gray-400 dark:text-slate-500">
-                              No map
-                            </span>
-                          )}
-                        </td>
 
                         <td className="px-4 py-3">
                           <Button
@@ -1174,7 +1143,7 @@ export function TeamAttendancePage() {
                         <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-400">
                           {record.regularization?.reason ? (
                             <p
-                              className="max-w-[280px] truncate"
+                              className="max-w-70 truncate"
                               title={record.regularization.reason}
                             >
                               {record.regularization.reason}

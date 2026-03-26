@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getTeamAnalytics } from "../api/services/team.service";
+import { getTeamAnalytics, getTeamMembers } from "../api/services/team.service";
 
 export function useTeamAnalytics(startDate, endDate) {
   const [data, setData] = useState({ team_members: [], aggregate: {} });
@@ -10,28 +10,49 @@ export function useTeamAnalytics(startDate, endDate) {
     setLoading(true);
     setError(null);
     try {
-      const res = await getTeamAnalytics(startDate, endDate);
-      // API returns { success, data: [...], meta: {...} }
-      const items = res.data.data || res.data || [];
-      const meta = res.data.meta || {};
+      // Fetch both analytics data and team members data
+      const [analyticsRes, membersRes] = await Promise.all([
+        getTeamAnalytics(startDate, endDate),
+        getTeamMembers()
+      ]);
+      
+      // Process analytics data
+      const items = analyticsRes.data.data || analyticsRes.data || [];
+      const meta = analyticsRes.data.meta || {};
 
-      // Map to format compatible with the frontend
-      const team_members = items.map((item) => ({
-        id: item.user?.id,
-        name: item.user?.fullName,
-        email: item.user?.email,
-        summary: {
-          present_days: item.summary?.presentDays ?? 0,
-          half_days: item.summary?.halfDays ?? 0,
-          absent_days: item.summary?.absentDays ?? 0,
-          leave_days: item.summary?.leaveDays ?? 0,
-          total_work_minutes: item.summary?.totalWorkedMinutes ?? 0,
-        },
-        work_hours: {
-          total_minutes: item.summary?.totalWorkedMinutes ?? 0,
-        },
-        attendance_percentage: item.summary?.attendancePercentage,
-      }));
+      // Get team members with roles
+      const teamMembersData = membersRes.data.data || membersRes.data || [];
+      const employeesMap = new Map();
+      
+      // Create a map of employee IDs for quick lookup
+      teamMembersData.forEach(member => {
+        if (member.roles && member.roles.some(role => 
+          typeof role === 'string' ? role.toLowerCase() === 'employee' : 
+          (role.name && role.name.toLowerCase() === 'employee')
+        )) {
+          employeesMap.set(member.id, true);
+        }
+      });
+
+      // Map to format compatible with the frontend, filtering by employee role
+      const team_members = items
+        .filter(item => item.user?.id && employeesMap.has(item.user.id))
+        .map((item) => ({
+          id: item.user?.id,
+          name: item.user?.fullName,
+          email: item.user?.email,
+          summary: {
+            present_days: item.summary?.presentDays ?? 0,
+            half_days: item.summary?.halfDays ?? 0,
+            absent_days: item.summary?.absentDays ?? 0,
+            leave_days: item.summary?.leaveDays ?? 0,
+            total_work_minutes: item.summary?.totalWorkedMinutes ?? 0,
+          },
+          work_hours: {
+            total_minutes: item.summary?.totalWorkedMinutes ?? 0,
+          },
+          attendance_percentage: item.summary?.attendancePercentage,
+        }));
 
       // Map aggregate from meta
       const aggregate = {

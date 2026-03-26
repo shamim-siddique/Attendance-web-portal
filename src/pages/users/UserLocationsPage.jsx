@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MapPin, Search, UserX, Loader2 } from "lucide-react";
+import { MapPin, Search, UserX, Loader2, Navigation } from "lucide-react";
 import { getTeamMembers } from "../../api/services/team.service";
 import {
   getUserLocation,
@@ -27,6 +27,7 @@ export function UserLocationsPage() {
   const [saveLoading, setSaveLoading] = useState(false);
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
+  const [gettingLocation, setGettingLocation] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -107,9 +108,15 @@ export function UserLocationsPage() {
 
   const filteredMembers = members.filter(
     (m) =>
-      !search.trim() ||
-      m.name?.toLowerCase().includes(search.toLowerCase()) ||
-      m.email?.toLowerCase().includes(search.toLowerCase()),
+      // Filter by search term
+      (!search.trim() ||
+        m.name?.toLowerCase().includes(search.toLowerCase()) ||
+        m.email?.toLowerCase().includes(search.toLowerCase())) &&
+      // Filter by role - only show members who have "employee" in their roles
+      (m.roles && m.roles.some(role => 
+        typeof role === 'string' ? role.toLowerCase() === 'employee' : 
+        (role.name && role.name.toLowerCase() === 'employee')
+      )),
   );
   const selectedMember = members.find((m) => m.id === selectedId);
 
@@ -154,6 +161,48 @@ export function UserLocationsPage() {
     } finally {
       setSaveLoading(false);
     }
+  };
+
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by this browser.");
+      return;
+    }
+
+    setGettingLocation(true);
+    setError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude: lat, longitude: lng } = position.coords;
+        setLatitude(lat.toFixed(6));
+        setLongitude(lng.toFixed(6));
+        setGettingLocation(false);
+        setSuccess("Current location retrieved successfully!");
+        setTimeout(() => setSuccess(null), 3000);
+      },
+      (error) => {
+        setGettingLocation(false);
+        let errorMessage = "Failed to get current location.";
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location permission denied. Please enable location access.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information is unavailable.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out.";
+            break;
+        }
+        setError(errorMessage);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
   };
 
   const getInitial = (name, email) =>
@@ -326,19 +375,37 @@ export function UserLocationsPage() {
                   onChange={(e) => setRadius(e.target.value)}
                   hint="Employees must be within this radius to punch in from the mobile app."
                 />
-                <Button
-                  type="submit"
-                  variant="primary"
-                  loading={saveLoading}
-                  disabled={saveLoading}
-                >
-                  {saveLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <MapPin className="w-4 h-4" />
-                  )}
-                  {locationExists ? "Update Location" : "Set Location"}
-                </Button>
+                <div className="flex gap-3">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    loading={saveLoading}
+                    disabled={saveLoading}
+                    className="flex-1"
+                  >
+                    {saveLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <MapPin className="w-4 h-4" />
+                    )}
+                    {locationExists ? "Update Location" : "Set Location"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    loading={gettingLocation}
+                    disabled={gettingLocation}
+                    onClick={handleGetCurrentLocation}
+                    className="flex items-center gap-2"
+                  >
+                    {gettingLocation ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Navigation className="w-4 h-4" />
+                    )}
+                    Current Location
+                  </Button>
+                </div>
               </form>
             )}
           </>
