@@ -47,6 +47,7 @@ export const getTeamAnalytics = (startDate, endDate) =>
   api.get("/web/attendance/overview", {
     params: { startDate, endDate, limit: 100 },
   });
+  
 
 // Device change requests
 export const getDeviceChangeRequests = () =>

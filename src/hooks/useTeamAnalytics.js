@@ -15,6 +15,8 @@ export function useTeamAnalytics(startDate, endDate) {
         getTeamAnalytics(startDate, endDate),
         getTeamMembers()
       ]);
+
+      console.log(analyticsRes, membersRes);
       
       // Process analytics data
       const items = analyticsRes.data.data || analyticsRes.data || [];
@@ -54,9 +56,11 @@ export function useTeamAnalytics(startDate, endDate) {
           attendance_percentage: item.summary?.attendancePercentage,
         }));
 
-      // Map aggregate from meta
+      // Calculate aggregate from the filtered team members data
       const aggregate = {
-        average_attendance_percentage: meta.aggregate?.attendancePercentage,
+        average_attendance_percentage: team_members.length > 0 
+          ? team_members.reduce((sum, member) => sum + (member.attendance_percentage || 0), 0) / team_members.length 
+          : 0,
         present_days: meta.aggregate?.presentDays ?? 0,
         half_days: meta.aggregate?.halfDays ?? 0,
         absent_days: meta.aggregate?.absentDays ?? 0,

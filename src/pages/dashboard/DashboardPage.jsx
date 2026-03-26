@@ -345,16 +345,36 @@ export function DashboardPage() {
 
         // Extract data from { success, data, meta } response structure
         const membersData = membersRes.data.data || membersRes.data || [];
+        const analyticsData = analyticsRes.data.data || analyticsRes.data || [];
         const analyticsMeta = analyticsRes.data.meta || {};
         const pendingLeavesMeta = pendingLeavesRes.data.meta || {};
         const totalLeavesMeta = totalLeavesRes.data.meta || {};
 
+        // Filter analytics data to only include employees
+        const employeesMap = new Map();
+        membersData.forEach(member => {
+          if (member.roles && member.roles.some(role => 
+            typeof role === 'string' ? role.toLowerCase() === 'employee' : 
+            (role.name && role.name.toLowerCase() === 'employee')
+          )) {
+            employeesMap.set(member.id, true);
+          }
+        });
+
+        const employeeAnalytics = analyticsData.filter(item => 
+          item.user?.id && employeesMap.has(item.user.id)
+        );
+
+        // Calculate average attendance percentage from actual employee data
+        const averageAttendancePercentage = employeeAnalytics.length > 0 
+          ? employeeAnalytics.reduce((sum, item) => sum + (item.summary?.attendancePercentage || 0), 0) / employeeAnalytics.length 
+          : 0;
+
         setMembers(membersData);
-        // Build analytics object from meta.aggregate
+        // Build analytics object with correctly calculated average
         setAnalytics({
           aggregate: {
-            average_attendance_percentage:
-              analyticsMeta.aggregate?.attendancePercentage,
+            average_attendance_percentage: averageAttendancePercentage,
             present_days: analyticsMeta.aggregate?.presentDays ?? 0,
             absent_days: analyticsMeta.aggregate?.absentDays ?? 0,
             holiday_days: analyticsMeta.aggregate?.holidayDays ?? 0,
