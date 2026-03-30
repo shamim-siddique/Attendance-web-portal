@@ -383,11 +383,7 @@ export function UserLocationsPage() {
                     disabled={saveLoading}
                     className="flex-1"
                   >
-                    {saveLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <MapPin className="w-4 h-4" />
-                    )}
+                    <MapPin className="w-4 h-4" />
                     {locationExists ? "Update Location" : "Set Location"}
                   </Button>
                   <Button
@@ -398,11 +394,7 @@ export function UserLocationsPage() {
                     onClick={handleGetCurrentLocation}
                     className="flex items-center gap-2"
                   >
-                    {gettingLocation ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Navigation className="w-4 h-4" />
-                    )}
+                    <Navigation className="w-4 h-4" />
                     Current Location
                   </Button>
                 </div>

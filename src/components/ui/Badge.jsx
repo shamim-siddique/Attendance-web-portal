@@ -12,7 +12,7 @@ const variantStyles = {
 
   violet: 'bg-violet-500/10 text-violet-400 border border-violet-500/20',
 
-  slate: 'bg-slate-700 text-slate-400 border border-slate-600'
+  slate: 'bg-white text-gray-900 border border-gray-300 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600'
 
 }
 
