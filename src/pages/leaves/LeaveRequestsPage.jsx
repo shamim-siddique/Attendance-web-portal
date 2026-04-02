@@ -126,7 +126,16 @@ export function LeaveRequestsPage() {
             Date <SortIcon column={column} />
           </button>
         ),
-        cell: ({ getValue }) => formatDate(getValue()),
+        cell: ({ row }) => {
+          const startDate = row.original.start_date;
+          const endDate = row.original.end_date;
+          
+          if (startDate === endDate) {
+            return formatDate(startDate);
+          }
+          
+          return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+        },
       }),
       columnHelper.accessor("reason", {
         header: "Reason",
@@ -480,7 +489,11 @@ export function LeaveRequestsPage() {
         title="Reject Leave Request"
         subtitle={
           rejectTarget
-            ? `${rejectTarget.username} · ${formatDate(rejectTarget.leave_date)}`
+            ? `${rejectTarget.username} · ${
+                rejectTarget.start_date === rejectTarget.end_date
+                  ? formatDate(rejectTarget.start_date)
+                  : `${formatDate(rejectTarget.start_date)} - ${formatDate(rejectTarget.end_date)}`
+              }`
             : ""
         }
         footer={
@@ -518,7 +531,10 @@ export function LeaveRequestsPage() {
                   {rejectTarget.username}
                 </p>
                 <p className="text-slate-400 text-sm">
-                  {formatDate(rejectTarget.leave_date)}
+                  {rejectTarget.start_date === rejectTarget.end_date
+                    ? formatDate(rejectTarget.start_date)
+                    : `${formatDate(rejectTarget.start_date)} - ${formatDate(rejectTarget.end_date)}`
+                  }
                   {rejectTarget.reason ? ` · ${rejectTarget.reason}` : ""}
                 </p>
               </div>

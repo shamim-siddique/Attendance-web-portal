@@ -21,6 +21,8 @@ export function useLeaveRequests(startDate, endDate, statusFilter) {
         username: item.user?.fullName,
         email: item.user?.email,
         leave_date: item.startDate, // Use startDate as the primary date display
+        start_date: item.startDate, // Preserve start date for range display
+        end_date: item.endDate, // Preserve end date for range display
         created_at: item.createdAt,
         // Status is now uppercase (PENDING, APPROVED, REJECTED, CANCELLED)
         // Map to lowercase for UI compatibility
