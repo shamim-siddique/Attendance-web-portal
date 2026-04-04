@@ -10,8 +10,6 @@ import { LoginPage } from './pages/auth/LoginPage'
 
 import { DashboardPage } from './pages/dashboard/DashboardPage'
 
-import { CreateUserPage } from './pages/users/CreateUserPage'
-
 import { UserLocationsPage } from './pages/users/UserLocationsPage'
 
 import { TeamMembersPage } from './pages/team/TeamMembersPage'
@@ -49,8 +47,6 @@ export default function App() {
             <Route index element={<Navigate to="/dashboard" replace />} />
 
             <Route path="/dashboard" element={<DashboardPage />} />
-
-            <Route path="/users/create" element={<CreateUserPage />} />
 
             <Route path="/users/locations" element={<UserLocationsPage />} />
 

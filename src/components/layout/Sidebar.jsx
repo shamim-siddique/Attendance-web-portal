@@ -20,8 +20,6 @@ import {
 
   Calendar,
 
-  UserPlus,
-
   MapPin,
 
   Smartphone,
@@ -53,8 +51,6 @@ const navItems = [
   { to: '/team/device-change-requests', icon: Smartphone, label: 'Device Requests' },
 
   { to: '/holidays', icon: Calendar, label: 'Holidays' },
-
-  { to: '/users/create', icon: UserPlus, label: 'Create User' },
 
   { to: '/users/locations', icon: MapPin, label: 'Locations' }
 

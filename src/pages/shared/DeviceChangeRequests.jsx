@@ -66,159 +66,172 @@ export function DeviceChangeRequests() {
 
   const columnHelper = createColumnHelper();
   const columns = useMemo(
-    () => [
-      columnHelper.accessor("user.username", {
-        id: "employee",
-        header: ({ column }) => (
-          <button
-            type="button"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
-          >
-            Employee <SortIcon column={column} />
-          </button>
-        ),
-        cell: ({ row }) => {
-          const user = row.original.user || {};
-          return (
-            <div>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium shrink-0">
-                  {user.username?.charAt(0)?.toUpperCase() ?? "?"}
-                </div>
-                <span className="font-medium text-gray-900 dark:text-white">
-                  {user.username || "Unknown"}
-                </span>
-              </div>
-              <p className="text-gray-600 dark:text-slate-400 text-xs mt-0.5">
-                {user.email || ""}
-              </p>
-            </div>
-          );
-        },
-      }),
-      columnHelper.accessor("old_device_id", {
-        header: "Old Device ID",
-        cell: ({ getValue }) => (
-          <span
-            className="text-gray-600 dark:text-slate-400 truncate max-w-30 block"
-            title={getValue()}
-          >
-            {getValue() || "—"}
-          </span>
-        ),
-      }),
-      columnHelper.accessor("new_device_id", {
-        header: "New Device ID",
-        cell: ({ getValue }) => (
-          <span
-            className="text-gray-700 dark:text-slate-300 truncate max-w-30 block font-mono text-xs"
-            title={getValue()}
-          >
-            {getValue() || "—"}
-          </span>
-        ),
-      }),
-      columnHelper.accessor("reason", {
-        header: "Reason",
-        cell: ({ getValue }) => (
-          <span
-            className="max-w-xs truncate block text-gray-600 dark:text-slate-400"
-            title={getValue()}
-          >
-            {getValue() || "—"}
-          </span>
-        ),
-        meta: { hideOnMobile: true },
-      }),
-      columnHelper.accessor("created_at", {
-        header: ({ column }) => (
-          <button
-            type="button"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
-          >
-            Requested Date <SortIcon column={column} />
-          </button>
-        ),
-        cell: ({ getValue }) => formatDate(getValue()?.slice(0, 10)),
-      }),
-      columnHelper.accessor("status", {
-        header: ({ column }) => (
-          <button
-            type="button"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
-          >
-            Status <SortIcon column={column} />
-          </button>
-        ),
-        cell: ({ getValue }) => (
-          <Badge variant={statusVariant[getValue()] || "slate"}>
-            {statusLabel[getValue()] ?? getValue()}
-          </Badge>
-        ),
-      }),
-      columnHelper.display({
-        id: "actions",
-        header: "Actions",
-        cell: ({ row }) => {
-          const r = row.original;
-          if (r.status !== "pending") {
-            if (r.status === "approved") {
-              return (
-                <span className="text-emerald-600 dark:text-emerald-400 text-xs">
-                  Approved
-                </span>
-              );
-            }
+    () => {
+      // Check if there are any pending requests
+      const hasPendingRequests = requests?.some(r => r.status === "pending");
+      
+      const baseColumns = [
+        columnHelper.accessor("user.username", {
+          id: "employee",
+          header: ({ column }) => (
+            <button
+              type="button"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
+            >
+              Employee <SortIcon column={column} />
+            </button>
+          ),
+          cell: ({ row }) => {
+            const user = row.original.user || {};
             return (
-              <span
-                title={r.reviewComment || ""}
-                className="text-rose-600 dark:text-rose-400 text-xs cursor-help"
-              >
-                Rejected
-              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium shrink-0">
+                    {user.username?.charAt(0)?.toUpperCase() ?? "?"}
+                  </div>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {user.username || "Unknown"}
+                  </span>
+                </div>
+                <p className="text-gray-600 dark:text-slate-400 text-xs mt-0.5">
+                  {user.email || ""}
+                </p>
+              </div>
             );
-          }
+          },
+        }),
+        columnHelper.accessor("old_device_id", {
+          header: "Old Device ID",
+          cell: ({ getValue }) => (
+            <span
+              className="text-gray-600 dark:text-slate-400 truncate max-w-30 block"
+              title={getValue()}
+            >
+              {getValue() || "—"}
+            </span>
+          ),
+        }),
+        columnHelper.accessor("new_device_id", {
+          header: "New Device ID",
+          cell: ({ getValue }) => (
+            <span
+              className="text-gray-700 dark:text-slate-300 truncate max-w-30 block font-mono text-xs"
+              title={getValue()}
+            >
+              {getValue() || "—"}
+            </span>
+          ),
+        }),
+        columnHelper.accessor("reason", {
+          header: "Reason",
+          cell: ({ getValue }) => (
+            <span
+              className="max-w-xs truncate block text-gray-600 dark:text-slate-400"
+              title={getValue()}
+            >
+              {getValue() || "—"}
+            </span>
+          ),
+          meta: { hideOnMobile: true },
+        }),
+        columnHelper.accessor("created_at", {
+          header: ({ column }) => (
+            <button
+              type="button"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
+            >
+              Requested Date <SortIcon column={column} />
+            </button>
+          ),
+          cell: ({ getValue }) => formatDate(getValue()?.slice(0, 10)),
+        }),
+        columnHelper.accessor("status", {
+          header: ({ column }) => (
+            <button
+              type="button"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
+            >
+              Status <SortIcon column={column} />
+            </button>
+          ),
+          cell: ({ getValue }) => (
+            <Badge variant={statusVariant[getValue()] || "slate"}>
+              {statusLabel[getValue()] ?? getValue()}
+            </Badge>
+          ),
+        }),
+      ];
 
-          const isApproving = approvingId === r.id;
-          return (
-            <div className="flex items-center gap-1">
-              {isApproving ? (
-                <Loader2 className="w-4 h-4 animate-spin text-indigo-600 dark:text-indigo-400" />
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => handleApprove(r.id)}
-                    disabled={approvingId != null}
-                    className="p-2 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 disabled:opacity-50"
-                    title="Approve"
+      // Only add actions column if there are pending requests
+      if (hasPendingRequests) {
+        baseColumns.push(
+          columnHelper.display({
+            id: "actions",
+            header: "Actions",
+            cell: ({ row }) => {
+              const r = row.original;
+              if (r.status !== "pending") {
+                if (r.status === "approved") {
+                  return (
+                    <span className="text-emerald-600 dark:text-emerald-400 text-xs">
+                      Approved
+                    </span>
+                  );
+                }
+                return (
+                  <span
+                    title={r.reviewComment || ""}
+                    className="text-rose-600 dark:text-rose-400 text-xs cursor-help"
                   >
-                    <Check className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRejectTarget(r);
-                      setRejectionReason("");
-                      setRejectError("");
-                    }}
-                    disabled={approvingId != null}
-                    className="p-2 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 disabled:opacity-50"
-                    title="Reject"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </>
-              )}
-            </div>
-          );
-        },
-      }),
-    ],
-    [columnHelper, SortIcon, approvingId],
+                    Rejected
+                  </span>
+                );
+              }
+
+              const isApproving = approvingId === r.id;
+              return (
+                <div className="flex items-center gap-1">
+                  {isApproving ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-indigo-600 dark:text-indigo-400" />
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleApprove(r.id)}
+                        disabled={approvingId != null}
+                        className="p-2 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 disabled:opacity-50"
+                        title="Approve"
+                      >
+                        <Check className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRejectTarget(r);
+                          setRejectionReason("");
+                          setRejectError("");
+                        }}
+                        disabled={approvingId != null}
+                        className="p-2 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 disabled:opacity-50"
+                        title="Reject"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
+              );
+            },
+          })
+        );
+      }
+
+      return baseColumns;
+    },
+    [requests, approvingId, SortIcon],
   );
 
   const table = useReactTable({

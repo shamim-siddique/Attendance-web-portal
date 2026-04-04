@@ -32,3 +32,16 @@ export const toDatetimeLocal = (isoStr) => {
 export const getToday = () => new Date().toISOString().split('T')[0]
 
 export const getFirstDayOfMonth = () => getToday().slice(0, 7) + '-01'
+
+export const getLastDayOfMonth = () => {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = today.getMonth()
+  // Get the last day of the current month by going to next month and day 0
+  const lastDay = new Date(year, month + 1, 0)
+  // Format as YYYY-MM-DD in local timezone
+  const yearStr = lastDay.getFullYear()
+  const monthStr = String(lastDay.getMonth() + 1).padStart(2, '0')
+  const dayStr = String(lastDay.getDate()).padStart(2, '0')
+  return `${yearStr}-${monthStr}-${dayStr}`
+}

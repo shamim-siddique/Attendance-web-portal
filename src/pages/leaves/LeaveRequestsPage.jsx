@@ -11,6 +11,7 @@ import {
   X,
   XCircle,
   Loader2,
+  Search,
 } from "lucide-react";
 import {
   useReactTable,
@@ -23,8 +24,12 @@ import {
 } from "@tanstack/react-table";
 import { useLeaveRequests } from "../../hooks/useLeaveRequests";
 import { approveLeave, rejectLeave } from "../../api/services/leave.service";
-import { formatDate } from "../../utils/dateUtils";
-import { getFirstDayOfMonth, getToday } from "../../utils/dateUtils";
+import {
+  formatDate,
+  getFirstDayOfMonth,
+  getLastDayOfMonth,
+  getToday,
+} from "../../utils/dateUtils";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { Modal } from "../../components/ui/Modal";
@@ -45,13 +50,14 @@ const statusLabel = {
 
 export function LeaveRequestsPage() {
   const [startDate, setStartDate] = useState(getFirstDayOfMonth());
-  const [endDate, setEndDate] = useState(getToday());
+  const [endDate, setEndDate] = useState(getLastDayOfMonth());
   const [statusFilter, setStatusFilter] = useState("all");
+  const [globalFilter, setGlobalFilter] = useState("");
   const {
     data: leaves,
     loading,
     refetch,
-  } = useLeaveRequests(startDate, endDate, statusFilter);
+  } = useLeaveRequests(startDate, endDate); // Remove statusFilter from API call
   const [approvingId, setApprovingId] = useState(null);
   const [rejectTarget, setRejectTarget] = useState(null);
   const [rejectionReason, setRejectionReason] = useState("");
@@ -59,17 +65,41 @@ export function LeaveRequestsPage() {
   const [rejectLoading, setRejectLoading] = useState(false);
   const [toast, setToast] = useState(null);
 
+  // Client-side filtering for both search and status
+  const filteredLeaves = useMemo(() => {
+    let filtered = leaves;
+    
+    // Apply status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((leave) => leave.status === statusFilter);
+    }
+    
+    // Apply search filter
+    if (globalFilter.trim()) {
+      const query = globalFilter.toLowerCase();
+      filtered = filtered.filter((leave) => {
+        return (
+          leave.username?.toLowerCase().includes(query) ||
+          leave.email?.toLowerCase().includes(query) ||
+          leave.reason?.toLowerCase().includes(query)
+        );
+      });
+    }
+    
+    return filtered;
+  }, [leaves, statusFilter, globalFilter]);
+
   const pendingCount = useMemo(
-    () => leaves.filter((l) => l.status === "pending").length,
-    [leaves],
+    () => filteredLeaves.filter((l) => l.status === "pending").length,
+    [filteredLeaves],
   );
   const approvedCount = useMemo(
-    () => leaves.filter((l) => l.status === "approved").length,
-    [leaves],
+    () => filteredLeaves.filter((l) => l.status === "approved").length,
+    [filteredLeaves],
   );
   const rejectedCount = useMemo(
-    () => leaves.filter((l) => l.status === "rejected").length,
-    [leaves],
+    () => filteredLeaves.filter((l) => l.status === "rejected").length,
+    [filteredLeaves],
   );
 
   const SortIcon = ({ column }) => {
@@ -89,163 +119,175 @@ export function LeaveRequestsPage() {
 
   const columnHelper = createColumnHelper();
   const columns = useMemo(
-    () => [
-      columnHelper.accessor("username", {
-        header: ({ column }) => (
-          <button
-            type="button"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
-          >
-            Employee <SortIcon column={column} />
-          </button>
-        ),
-        cell: ({ row }) => (
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium shrink-0">
-                {row.original.username?.charAt(0)?.toUpperCase() ?? "?"}
-              </div>
-              <span className="font-medium text-gray-900 dark:text-white">
-                {row.original.username}
-              </span>
-            </div>
-            <p className="text-gray-600 dark:text-slate-400 text-xs mt-0.5">
-              {row.original.email}
-            </p>
-          </div>
-        ),
-      }),
-      columnHelper.accessor("leave_date", {
-        header: ({ column }) => (
-          <button
-            type="button"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
-          >
-            Date <SortIcon column={column} />
-          </button>
-        ),
-        cell: ({ row }) => {
-          const startDate = row.original.start_date;
-          const endDate = row.original.end_date;
-          
-          if (startDate === endDate) {
-            return formatDate(startDate);
-          }
-          
-          return `${formatDate(startDate)} - ${formatDate(endDate)}`;
-        },
-      }),
-      columnHelper.accessor("reason", {
-        header: "Reason",
-        cell: ({ getValue }) => (
-          <span className="max-w-xs truncate block text-gray-600 dark:text-slate-400">
-            {getValue() || "—"}
-          </span>
-        ),
-        meta: { hideOnMobile: true },
-      }),
-      columnHelper.accessor("created_at", {
-        header: ({ column }) => (
-          <button
-            type="button"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
-          >
-            Applied On <SortIcon column={column} />
-          </button>
-        ),
-        cell: ({ getValue }) => formatDate(getValue()?.slice(0, 10)),
-        meta: { hideOnLg: true },
-      }),
-      columnHelper.accessor("status", {
-        header: ({ column }) => (
-          <button
-            type="button"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
-          >
-            Status <SortIcon column={column} />
-          </button>
-        ),
-        cell: ({ getValue }) => (
-          <Badge variant={statusVariant[getValue()] || "slate"}>
-            {statusLabel[getValue()] ?? getValue()}
-          </Badge>
-        ),
-      }),
-      columnHelper.accessor("approved_by_name", {
-        header: "Actioned By",
-        cell: ({ getValue }) => getValue() || "—",
-        meta: { hideOnLg: true },
-      }),
-      columnHelper.display({
-        id: "actions",
-        header: "Actions",
-        cell: ({ row }) => {
-          const r = row.original;
-          if (r.status !== "pending") {
-            if (r.status === "approved") {
-              return (
-                <span className="text-emerald-600 dark:text-emerald-400 text-xs">
-                  Approved
+    () => {
+      // Check if there are any pending leave requests
+      const hasPendingRequests = leaves?.some(l => l.status === "pending");
+      
+      const baseColumns = [
+        columnHelper.accessor("username", {
+          header: ({ column }) => (
+            <button
+              type="button"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
+            >
+              Employee <SortIcon column={column} />
+            </button>
+          ),
+          cell: ({ row }) => (
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium shrink-0">
+                  {row.original.username?.charAt(0)?.toUpperCase() ?? "?"}
+                </div>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  {row.original.username}
                 </span>
-              );
-            }
-            return (
-              <span
-                title={r.rejection_reason || ""}
-                className="text-rose-600 dark:text-rose-400 text-xs cursor-help"
-              >
-                Rejected
-              </span>
-            );
-          }
-          const isApproving = approvingId === r.id;
-          return (
-            <div className="flex items-center gap-1">
-              {isApproving ? (
-                <Loader2 className="w-4 h-4 animate-spin text-indigo-600 dark:text-indigo-400" />
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => handleApprove(r.id)}
-                    disabled={approvingId != null}
-                    className="p-2 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 disabled:opacity-50"
-                    title="Approve"
-                  >
-                    <Check className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRejectTarget(r);
-                      setRejectionReason("");
-                      setRejectError("");
-                    }}
-                    disabled={approvingId != null}
-                    className="p-2 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 disabled:opacity-50"
-                    title="Reject"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </>
-              )}
+              </div>
+              <p className="text-gray-600 dark:text-slate-400 text-xs mt-0.5">
+                {row.original.email}
+              </p>
             </div>
-          );
-        },
-      }),
-    ],
-    [columnHelper, SortIcon, approvingId],
+          ),
+        }),
+        columnHelper.accessor("leave_date", {
+          header: ({ column }) => (
+            <button
+              type="button"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
+            >
+              Date <SortIcon column={column} />
+            </button>
+          ),
+          cell: ({ row }) => {
+            const startDate = row.original.start_date;
+            const endDate = row.original.end_date;
+            
+            if (startDate === endDate) {
+              return formatDate(startDate);
+            }
+            
+            return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+          },
+        }),
+        columnHelper.accessor("reason", {
+          header: "Reason",
+          cell: ({ getValue }) => (
+            <span className="max-w-xs truncate block text-gray-600 dark:text-slate-400">
+              {getValue() || "—"}
+            </span>
+          ),
+          meta: { hideOnMobile: true },
+        }),
+        columnHelper.accessor("created_at", {
+          header: ({ column }) => (
+            <button
+              type="button"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
+            >
+              Applied On <SortIcon column={column} />
+            </button>
+          ),
+          cell: ({ getValue }) => formatDate(getValue()?.slice(0, 10)),
+          meta: { hideOnLg: true },
+        }),
+        columnHelper.accessor("status", {
+          header: ({ column }) => (
+            <button
+              type="button"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-slate-300"
+            >
+              Status <SortIcon column={column} />
+            </button>
+          ),
+          cell: ({ getValue }) => (
+            <Badge variant={statusVariant[getValue()] || "slate"}>
+              {statusLabel[getValue()] ?? getValue()}
+            </Badge>
+          ),
+        }),
+        columnHelper.accessor("approved_by_name", {
+          header: "Actioned By",
+          cell: ({ getValue }) => getValue() || "—",
+          meta: { hideOnLg: true },
+        }),
+      ];
+
+      // Only add actions column if there are pending requests
+      if (hasPendingRequests) {
+        baseColumns.push(
+          columnHelper.display({
+            id: "actions",
+            header: "Actions",
+            cell: ({ row }) => {
+              const r = row.original;
+              if (r.status !== "pending") {
+                if (r.status === "approved") {
+                  return (
+                    <span className="text-emerald-600 dark:text-emerald-400 text-xs">
+                      Approved
+                    </span>
+                  );
+                }
+                return (
+                  <span
+                    title={r.rejection_reason || ""}
+                    className="text-rose-600 dark:text-rose-400 text-xs cursor-help"
+                  >
+                    Rejected
+                  </span>
+                );
+              }
+              const isApproving = approvingId === r.id;
+              return (
+                <div className="flex items-center gap-1">
+                  {isApproving ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-indigo-600 dark:text-indigo-400" />
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleApprove(r.id)}
+                        disabled={approvingId != null}
+                        className="p-2 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 disabled:opacity-50"
+                        title="Approve"
+                      >
+                        <Check className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRejectTarget(r);
+                          setRejectionReason("");
+                          setRejectError("");
+                        }}
+                        disabled={approvingId != null}
+                        className="p-2 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 disabled:opacity-50"
+                        title="Reject"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
+              );
+            },
+          })
+        );
+      }
+
+      return baseColumns;
+    },
+    [leaves, approvingId, SortIcon],
   );
 
   const table = useReactTable({
-    data: leaves,
+    data: filteredLeaves,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     initialState: { pagination: { pageSize: 15 } },
@@ -333,20 +375,32 @@ export function LeaveRequestsPage() {
           onApply={handleApplyDates}
           loading={loading}
         />
-        <div className="mt-3 flex flex-wrap gap-3 items-center">
-          <label className="text-gray-600 dark:text-slate-400 text-sm">
-            Status
-          </label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl px-4 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-600 dark:focus:border-indigo-500"
-          >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
+        <div className="mt-3 flex flex-col gap-3">
+          <div className="relative max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-500" />
+            <input
+              type="text"
+              placeholder="Search by employee name, email, or reason..."
+              value={globalFilter ?? ""}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="w-full bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-gray-900 dark:text-white text-sm placeholder:text-gray-500 dark:placeholder:text-slate-500 focus:outline-none focus:border-indigo-600 dark:focus:border-indigo-500"
+            />
+          </div>
+          <div className="flex flex-wrap gap-3 items-center">
+            <label className="text-gray-600 dark:text-slate-400 text-sm">
+              Status
+            </label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl px-4 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-600 dark:focus:border-indigo-500"
+            >
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
         </div>
       </div>
 

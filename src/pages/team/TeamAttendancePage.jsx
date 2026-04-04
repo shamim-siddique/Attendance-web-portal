@@ -662,7 +662,7 @@
 //   );
 // }
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   Calendar,
@@ -670,6 +670,7 @@ import {
   ChevronRight,
   Filter,
   PencilLine,
+  Search,
 } from "lucide-react";
 import { useTeamAttendance } from "../../hooks/useTeamAttendance";
 import {
@@ -686,6 +687,7 @@ import {
   formatMinutes,
   formatTime,
   getFirstDayOfMonth,
+  getLastDayOfMonth,
   getToday,
   toDatetimeLocal,
 } from "../../utils/dateUtils";
@@ -751,11 +753,12 @@ const canRegularizeRecord = (record, today) =>
 export function TeamAttendancePage() {
   const today = getToday();
   const defaultStartDate = getFirstDayOfMonth();
-  const defaultEndDate = today;
+  const defaultEndDate = getLastDayOfMonth();
 
   const [draftStartDate, setDraftStartDate] = useState(defaultStartDate);
   const [draftEndDate, setDraftEndDate] = useState(defaultEndDate);
   const [draftStatus, setDraftStatus] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
     startDate: defaultStartDate,
     endDate: defaultEndDate,
@@ -771,6 +774,22 @@ export function TeamAttendancePage() {
     page: filters.page,
     limit: filters.limit,
   });
+
+  // Filter attendance data based on search query
+  const filteredAttendance = useMemo(() => {
+    if (!searchQuery.trim()) return attendance;
+    
+    const query = searchQuery.toLowerCase();
+    return attendance.filter((record) => {
+      return (
+        record.username?.toLowerCase().includes(query) ||
+        record.email?.toLowerCase().includes(query) ||
+        record.punch_date?.includes(query) ||
+        record.attendance_state?.toLowerCase().includes(query) ||
+        record.regularization?.reason?.toLowerCase().includes(query)
+      );
+    });
+  }, [attendance, searchQuery]);
 
   const [regularizationTarget, setRegularizationTarget] = useState(null);
   const [overrideStatus, setOverrideStatus] = useState("PRESENT");
@@ -1014,6 +1033,17 @@ export function TeamAttendancePage() {
         {rangeNote && (
           <p className="text-xs text-gray-500 dark:text-slate-500">{rangeNote}</p>
         )}
+        
+        <div className="relative max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-500" />
+          <input
+            type="text"
+            placeholder="Search by name, email, date, status, or reason..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-gray-900 dark:text-white text-sm placeholder:text-gray-500 dark:placeholder:text-slate-500 focus:outline-none focus:border-indigo-600 dark:focus:border-indigo-500"
+          />
+        </div>
       </section>
 
       <section className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden">
@@ -1031,11 +1061,11 @@ export function TeamAttendancePage() {
               ))}
             </div>
           ))
-        ) : attendance.length === 0 ? (
+        ) : filteredAttendance.length === 0 ? (
           <EmptyState
             icon={Calendar}
             title="No attendance records found."
-            description="Try adjusting the selected date range or status filter."
+            description="Try adjusting your search query or filters."
           />
         ) : (
           <>
@@ -1071,7 +1101,7 @@ export function TeamAttendancePage() {
                 </thead>
 
                 <tbody>
-                  {attendance.map((record) => {
+                  {filteredAttendance.map((record) => {
                     const canRegularize = canRegularizeRecord(record, today);
 
                     return (
@@ -1161,14 +1191,17 @@ export function TeamAttendancePage() {
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-4 py-3 border-t border-gray-200 dark:border-slate-800">
               <p className="text-sm text-gray-600 dark:text-slate-400">
-                Showing {rangeStart}-{rangeEnd} of {totalRecords} records
+                {searchQuery 
+                  ? `Showing ${filteredAttendance.length} filtered records`
+                  : `Showing ${rangeStart}-${rangeEnd} of ${totalRecords} records`
+                }
               </p>
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage <= 1 || loading}
+                  disabled={currentPage <= 1 || loading || searchQuery !== ""}
                   className="p-2 rounded-lg text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -1181,7 +1214,7 @@ export function TeamAttendancePage() {
                 <button
                   type="button"
                   onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage >= totalPages || totalPages === 0 || loading}
+                  disabled={currentPage >= totalPages || totalPages === 0 || loading || searchQuery !== ""}
                   className="p-2 rounded-lg text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronRight className="w-5 h-5" />

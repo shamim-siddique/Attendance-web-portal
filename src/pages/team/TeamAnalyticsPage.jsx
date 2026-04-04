@@ -11,6 +11,7 @@ import {
   Clock,
   XCircle,
   Download,
+  Search,
 } from "lucide-react";
 import {
   useReactTable,
@@ -25,6 +26,7 @@ import { useTeamAnalytics } from "../../hooks/useTeamAnalytics";
 import {
   formatMinutes,
   getFirstDayOfMonth,
+  getLastDayOfMonth,
   getToday,
 } from "../../utils/dateUtils";
 import { exportToCSV } from "../../utils/csvUtils";
@@ -35,7 +37,8 @@ import { StatCard } from "../../components/ui/StatCard";
 
 export function TeamAnalyticsPage() {
   const [startDate, setStartDate] = useState(getFirstDayOfMonth());
-  const [endDate, setEndDate] = useState(getToday());
+  const [endDate, setEndDate] = useState(getLastDayOfMonth());
+  const [globalFilter, setGlobalFilter] = useState("");
   const { data, loading, refetch } = useTeamAnalytics(startDate, endDate);
   const members = data.team_members || [];
   const aggregate = data.aggregate || {};
@@ -190,6 +193,8 @@ export function TeamAnalyticsPage() {
   const table = useReactTable({
     data: members,
     columns,
+    state: { globalFilter },
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -251,6 +256,16 @@ export function TeamAnalyticsPage() {
           onApply={handleApplyDates}
           loading={loading}
         />
+        <div className="mt-4 relative max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-500" />
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={globalFilter ?? ""}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="w-full bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-gray-900 dark:text-white text-sm placeholder:text-gray-500 dark:placeholder:text-slate-500 focus:outline-none focus:border-indigo-600 dark:focus:border-indigo-500"
+          />
+        </div>
       </div>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
